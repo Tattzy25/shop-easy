@@ -1084,7 +1084,7 @@ function createServer() {
   server.registerTool(
     "create_cart",
     {
-      description: "Create a new cart with line items and optional buyer context.",
+      description: "Create a new cart with line items and optional buyer context. Use this when the buyer asks to place selected catalog products into a cart. The response includes the merchant-assigned cart ID, validated line items, estimated totals, and a 'continue_url' for continuing on the merchant's storefront.",
       inputSchema: createCartInputSchema
     },
     async ({ shop_domain, meta, cart }: z.infer<typeof createCartInputSchema>) => {
@@ -1109,7 +1109,7 @@ function createServer() {
   server.registerTool(
     "get_cart",
     {
-      description: "Retrieve the current state of an existing cart.",
+      description: "Retrieve the current state of an existing cart. Use this to review its contents, refresh estimated totals, or obtain the current full state before an update. If the cart does not exist or has expired, the tool may return a successful JSON-RPC result whose messages array contains an unrecoverable error with code 'not_found'. Check the returned business outcome rather than assuming that a successful transport response means the cart exists.",
       inputSchema: getCartInputSchema
     },
     async ({ shop_domain, meta, id }: z.infer<typeof getCartInputSchema>) => {
@@ -1134,7 +1134,7 @@ function createServer() {
   server.registerTool(
     "update_cart",
     {
-      description: "Replace the contents of an existing cart.",
+      description: "Replace the contents of an existing cart. This tool uses PUT semantics: every request replaces the cart's full state with the supplied payload. Omitted fields, including 'line_items' or 'context', are removed. There is no server-side merge of partial updates. Preserve all existing state that the user has not asked to change.",
       inputSchema: updateCartInputSchema
     },
     async ({ shop_domain, meta, id, cart }: z.infer<typeof updateCartInputSchema>) => {
@@ -1159,7 +1159,7 @@ function createServer() {
   server.registerTool(
     "cancel_cart",
     {
-      description: "Cancel an active cart.",
+      description: "Cancel an active cart. Requires meta[\"idempotency-key\"] containing a UUID, in addition to meta[\"ucp-agent\"]. Cancellation removes the cart from storage. Subsequent requests for the same cart ID return a 'not_found' business outcome. Use this only when the user requests or clearly authorizes cancellation.",
       inputSchema: cancelCartInputSchema
     },
     async ({ shop_domain, meta, id }: z.infer<typeof cancelCartInputSchema>) => {
@@ -1185,7 +1185,7 @@ function createServer() {
   server.registerTool(
     "create_checkout",
     {
-      description: "Create a new checkout session with line items, buyer information, and fulfillment preferences.",
+      description: "Create a new checkout session with line items, buyer information, and fulfillment preferences. Use this tool when a buyer is ready to purchase items and you need to initiate the checkout process. The response includes a `continue_url` for handing off to a trusted UI. When to use: Buyer says \"I want to buy this item\", or Agent has collected enough information to start checkout, and Buyer confirms their cart and wants to proceed.",
       inputSchema: createCheckoutInputSchema
     },
     async ({ shop_domain, meta, cart_id, checkout }: z.infer<typeof createCheckoutInputSchema>) => {
@@ -1213,7 +1213,7 @@ function createServer() {
   server.registerTool(
     "get_checkout",
     {
-      description: "Retrieve the current state of an existing checkout session.",
+      description: "Retrieve the current state of an existing checkout session. Use this tool to check the status of a checkout, see updated totals after changes, or verify what information is still needed before completion. When to use: Need to refresh checkout state after buyer returns, Want to show current totals and line items, or Checking if checkout is ready for payment.",
       inputSchema: getCheckoutInputSchema
     },
     async ({ shop_domain, meta, id }: z.infer<typeof getCheckoutInputSchema>) => {
@@ -1238,7 +1238,7 @@ function createServer() {
   server.registerTool(
     "update_checkout",
     {
-      description: "Update an existing checkout session with new information.",
+      description: "Update an existing checkout session with new information. Use this tool to modify line items, update shipping address, change fulfillment method, or add buyer information before completing the checkout. When to use: Buyer wants to change quantity or remove items, Buyer provides or updates shipping address, Need to update buyer email or contact info, or Changing a delivery option. Caution: `update_checkout` uses PUT semantics. Each request replaces the full checkout state with the payload you send. Omit a field (for example `line_items` or `buyer`) and it is removed from the checkout. There is no server-side merge of partial updates. Before sending an update, remove response-only fields from the payload. `checkout.buyer.country_code` isn't accepted as input. `checkout.payment.instruments[].display` is response-only. For fulfillment updates, `checkout.fulfillment.methods[].id` is optional, but `line_item_ids` is required.",
       inputSchema: updateCheckoutInputSchema
     },
     async ({ shop_domain, meta, id, checkout }: z.infer<typeof updateCheckoutInputSchema>) => {
@@ -1263,7 +1263,7 @@ function createServer() {
   server.registerTool(
     "complete_checkout",
     {
-      description: "Submit payment and place the order.",
+      description: "Submit payment and place the order. Requires `meta[\"idempotency-key\"]` (UUID) in addition to `meta[\"ucp-agent\"]`. Use this tool when the checkout is ready and the buyer has authorized payment. This finalizes the transaction and creates an order. When to use: Checkout status is `ready_for_complete`, Buyer has reviewed and confirmed the order, or Payment credential has been collected.",
       inputSchema: completeCheckoutInputSchema
     },
     async ({ shop_domain, meta, id, checkout }: z.infer<typeof completeCheckoutInputSchema>) => {
@@ -1288,7 +1288,7 @@ function createServer() {
   server.registerTool(
     "cancel_checkout",
     {
-      description: "Cancel an active checkout session.",
+      description: "Cancel an active checkout session. Requires `meta[\"idempotency-key\"]` (UUID) in addition to `meta[\"ucp-agent\"]`. Use this tool when a buyer abandons the checkout or explicitly requests cancellation. Canceled checkouts can't be resumed. Cancellation expires the checkout immediately. The canceled checkout resource includes `expires_at`, which is set to the cancellation timestamp. When to use: Buyer explicitly cancels the order, Session has been abandoned, or Need to start fresh with a new checkout.",
       inputSchema: cancelCheckoutInputSchema
     },
     async ({ shop_domain, meta, id }: z.infer<typeof cancelCheckoutInputSchema>) => {
@@ -1314,7 +1314,7 @@ function createServer() {
   server.registerTool(
     "search_shop_policies_and_faqs",
     {
-      description: "Answers questions about the store's policies, products, and services to build customer trust.",
+      description: "Answers questions about the store's policies, products, and services to build customer trust. When to use: A customer asks \"What's your return policy?\", You need to clarify shipping or payment options, or A customer has questions about product care or warranties. Use natural language to query the search or the search will fail.",
       inputSchema: searchShopPoliciesAndFaqsInputSchema
     },
     async ({ store_domain, query, context }: z.infer<typeof searchShopPoliciesAndFaqsInputSchema>) => {

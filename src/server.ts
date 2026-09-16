@@ -1369,6 +1369,14 @@ function createServer() {
 
 export default {
   fetch(request, env, ctx) {
-    return createMcpHandler(createServer)(request, env, ctx);
+    return createMcpHandler(createServer, {
+      allowedHostnames: ["shop-easy.anigok.com"],
+      corsOptions: {
+        origin: "*",
+        methods: ["GET", "POST", "OPTIONS"],
+        headers: ["Content-Type", "Authorization", "Accept"],
+      },
+    })(request, env, ctx);
   }
 } satisfies ExportedHandler;
+

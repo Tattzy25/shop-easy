@@ -34,7 +34,7 @@ const globalSearchCatalogInputSchema = z.object({
         .optional(),
       like: z
         .array(z.object({}).passthrough())
-        .describe("Similar item to search by. Use either an item reference or image content. Pass both catalog.query and an image in catalog.like for multimodal search. Multimodal search uses the text query to describe what the agent is looking for and the image to provide visual context, such as style, shape, or pattern. Pass only an image for visual similarity search, which returns items that visually resemble the image without additional text intent.")
+        .describe("Use `catalog.like` in a `search_catalog` request to find products similar to a reference product, variant, or image. Pass one item as one of: Item reference (a product or variant GID, e.g., `{\"id\": \"gid://shopify/p/...\"}`, `{\"id\": \"gid://shopify/Product/...\"}`, or `{\"id\": \"gid://shopify/ProductVariant/...\"}`), or Image content (a base64-encoded image with its MIME type, e.g., `{\"image\": {\"content_type\": \"image/jpeg\", \"data\": \"<base64>\"}}`). You can combine `like` with `query` in a single request to narrow similarity results by keyword. When `like` contains an image and `query` is present, Global Catalog uses multimodal search. Multimodal search uses the text query to describe what the agent is looking for and the image to provide visual context, such as style, shape, or pattern. When `like` contains only an image, Global Catalog uses visual similarity search, which returns items that visually resemble the image without additional text intent.")
         .optional(),
       context: z
         .object({
@@ -1017,7 +1017,7 @@ function createServer() {
   server.registerTool(
     "search_catalog",
     {
-      description: "Searches the store's product catalog. The response conforms to the UCP catalog search response, including a UCP metadata envelope; products with title, description, price range (minor units), media, and variants; and cursor-based pagination. Use this when a customer asks for products matching specific criteria or wants to browse items in a category.",
+      description: "Searches the store's product catalog. The response conforms to the UCP catalog search response, including a UCP metadata envelope; products with title, description, price range (minor units), media, and variants; and cursor-based pagination. When to use: A customer asks \"Do you have any organic coffee?\", You need to find products matching specific criteria, or A customer wants to browse items in a category.",
       inputSchema: searchCatalogInputSchema
     },
     async ({ shop_domain, meta, catalog }: z.infer<typeof searchCatalogInputSchema>) => {

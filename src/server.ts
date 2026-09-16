@@ -1,14 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
-import globalsearchMd from "./globalsearch.md?raw";
-import storefrontMd from "./storefrontsearch.md?raw";
 import { z } from "zod";
 
 // ==========================================
 // GLOBAL CATALOG SCHEMAS
 // ==========================================
 
-const globalGetLlmsDocsInputSchema = z.object({});
 
 const globalSearchCatalogInputSchema = z.object({
   meta: z
@@ -272,8 +269,6 @@ const globalGetProductInputSchema = z.object({
 // ==========================================
 // STOREFRONT CATALOG SCHEMAS
 // ==========================================
-
-const getLlmsDocsInputSchema = z.object({});
 
 const searchCatalogInputSchema = z.object({
   shop_domain: z
@@ -950,18 +945,6 @@ function createServer() {
   });
 
   // --- Global Catalog Tools ---
-  server.registerTool(
-    "global_get_llms_docs",
-    {
-      description: "Returns the full documentation for the global catalog server as markdown, including all available tools, parameters, curl examples, response shapes, and the Global Catalog extension reference. Call this first to understand what this server can do and how to call its tools.",
-      inputSchema: globalGetLlmsDocsInputSchema
-    },
-    async () => {
-      return {
-        content: [{ text: globalsearchMd, type: "text" }]
-      };
-    }
-  );
 
   server.registerTool(
     "global_search_catalog",
@@ -1030,18 +1013,6 @@ function createServer() {
   );
 
   // --- Storefront Catalog Tools ---
-  server.registerTool(
-    "get_llms_docs",
-    {
-      description: "Returns the full documentation for this server as markdown, including all available tools, parameters, curl examples, and response shapes. Call this first to understand what this server can do and how to call its tools.",
-      inputSchema: getLlmsDocsInputSchema
-    },
-    async () => {
-      return {
-        content: [{ text: storefrontMd, type: "text" }]
-      };
-    }
-  );
 
   server.registerTool(
     "search_catalog",

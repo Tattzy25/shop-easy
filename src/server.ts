@@ -1370,7 +1370,7 @@ function createServer() {
 export default {
   fetch(request, env, ctx) {
     return createMcpHandler(createServer, {
-      allowedHostnames: ["shop-easy.anigok.com", "tattty.com"],
+      allowedHostnames: ["shop-easy.anigok.com", "tattty.com", "global.tattty.com"],
       corsOptions: {
         origin: "*",
         methods: ["GET", "POST", "OPTIONS"],

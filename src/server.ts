@@ -1367,16 +1367,40 @@ function createServer() {
   return server;
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://global.tattty.com",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Accept",
+  "Vary": "Origin",
+};
+
 export default {
-  fetch(request, env, ctx) {
-    return createMcpHandler(createServer, {
-      allowedHostnames: ["shop-easy.anigok.com", "tattty.com", "global.tattty.com"],
+  async fetch(request, env, ctx) {
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
+      });
+    }
+
+    const response = await createMcpHandler(createServer, {
+      allowedHostnames: ["shop-easy.tattty.com", "tattty.com", "global.tattty.com"],
       corsOptions: {
-        origin: "*",
-        methods: ["GET", "POST", "OPTIONS"],
-        headers: ["Content-Type", "Authorization", "Accept"],
+        origin: "https://global.tattty.com",
+        methods: ["POST", "OPTIONS"],
+        headers: ["Content-Type", "Accept"],
       },
     })(request, env, ctx);
-  }
-} satisfies ExportedHandler;
 
+    const headers = new Headers(response.headers);
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      headers.set(key, value);
+    }
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  },
+} satisfies ExportedHandler;

@@ -1384,12 +1384,11 @@ export default {
     }
 
     const response = await createMcpHandler(createServer, {
-      allowedHostnames: ["shop-easy.tattty.com", "tattty.com", "global.tattty.com"],
-      corsOptions: {
-        origin: "https://global.tattty.com",
-        methods: ["POST", "OPTIONS"],
-        headers: ["Content-Type", "Accept"],
-      },
+  corsOptions: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "OPTIONS"],
+    headers: ["Content-Type", "Accept"],
+  },
     })(request, env, ctx);
 
     const headers = new Headers(response.headers);

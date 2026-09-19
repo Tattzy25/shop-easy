@@ -1368,31 +1368,31 @@ function createServer() {
 }
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Origin": "https://shop-easy.tattty.com",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Accept",
 };
-const mcpHandler = createMcpHandler(createServer);
+
+const mcpHandler = createMcpHandler(createServer, {
+  route: "/mcp",
+  allowedHostnames: ["shop-easy.tattty.com"],
+  allowedOriginHostnames: ["shop-easy.tattty.com"],
+  corsOptions: {
+    origin: "https://shop-easy.tattty.com",
+    allowMethods: ["POST", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Accept"],
+  },
+});
+
 export default {
   async fetch(request, env, ctx) {
-    // 1. Instantly respond to preflight OPTIONS requests
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
         headers: corsHeaders,
       });
     }
-    // 2. Execute MCP handler
-    const response = await mcpHandler(request, env, ctx);
-    // 3. Attach CORS headers to response
-    const headers = new Headers(response.headers);
-    headers.set("Access-Control-Allow-Origin", "*");
-    headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    headers.set("Access-Control-Allow-Headers", "Content-Type, Accept");
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
+
+    return mcpHandler(request, env, ctx);
   },
 } satisfies ExportedHandler;

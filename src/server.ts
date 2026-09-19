@@ -1367,43 +1367,8 @@ function createServer() {
   return server;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Accept",
-};
-
-const mcpHandler = createMcpHandler(createServer, {
-  route: "/mcp",
-  allowedHostnames: [],
-  allowedOriginHostnames: ["*"],
-  corsOptions: {
-    origin: "*",
-    allowMethods: ["GET", "POST", "PUT", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Accept"],
-  },
-});
-
 export default {
-  async fetch(request, env, ctx) {
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
-      });
-    }
-
-    const response = await mcpHandler(request, env, ctx);
-    const headers = new Headers(response.headers);
-
-    for (const [key, value] of Object.entries(corsHeaders)) {
-      headers.set(key, value as string);
-    }
-
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
-  },
+	fetch(request, env, ctx) {
+		return createMcpHandler(createServer)(request, env, ctx);
+	},
 } satisfies ExportedHandler;

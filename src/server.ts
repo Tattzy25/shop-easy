@@ -1368,18 +1368,18 @@ function createServer() {
 }
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://shop-easy.tattty.com",
-  "Access-Control-Allow-Methods": "POST, PUT, OPTIONS",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Accept",
 };
 
 const mcpHandler = createMcpHandler(createServer, {
   route: "/mcp",
-  allowedHostnames: ["shop-easy.tattty.com"],
-  allowedOriginHostnames: ["shop-easy.tattty.com"],
+  allowedHostnames: [],
+  allowedOriginHostnames: ["*"],
   corsOptions: {
-    origin: "https://shop-easy.tattty.com",
-    allowMethods: ["POST", "PUT", "OPTIONS"],
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "OPTIONS"],
     allowHeaders: ["Content-Type", "Accept"],
   },
 });
@@ -1393,6 +1393,17 @@ export default {
       });
     }
 
-    return mcpHandler(request, env, ctx);
+    const response = await mcpHandler(request, env, ctx);
+    const headers = new Headers(response.headers);
+
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      headers.set(key, value as string);
+    }
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 } satisfies ExportedHandler;

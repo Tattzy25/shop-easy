@@ -1369,7 +1369,7 @@ function createServer() {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://shop-easy.tattty.com",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, PUT, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Accept",
 };
 
@@ -1379,7 +1379,7 @@ const mcpHandler = createMcpHandler(createServer, {
   allowedOriginHostnames: ["shop-easy.tattty.com"],
   corsOptions: {
     origin: "https://shop-easy.tattty.com",
-    allowMethods: ["POST", "OPTIONS"],
+    allowMethods: ["POST", "PUT", "OPTIONS"],
     allowHeaders: ["Content-Type", "Accept"],
   },
 });

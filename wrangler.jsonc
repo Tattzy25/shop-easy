@@ -8,9 +8,7 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/mcp"]
   },
-  "analytics_engine_datasets": [
-    { "binding": "ANALYTICS_ENGINE", "dataset": "MCPS" }
-  ],
+
   "observability": {
     "logs": {
       "enabled": true,
